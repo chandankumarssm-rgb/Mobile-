@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="bho">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>फोन सिम्युलेटर ओएस</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+    }
+    body {
+      background: #1e1e24;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    /* फोन बॉडी */
+    .phone {
+      width: 360px;
+      height: 720px;
+      background: #000;
+      border-radius: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 6px #333;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    /* कैमरा नॉच */
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 20px;
+      background: #111;
+      border-radius: 12px;
+      z-index: 100;
+    }
+    /* स्टेटस बार */
+    .status-bar {
+      height: 35px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 12px;
+      z-index: 90;
+      padding-top: 8px;
+    }
+    /* स्क्रीन एरिया */
+    .screen {
+      flex: 1;
+      background: linear-gradient(135deg, #2b5876, #4e4376);
+      position: relative;
+      overflow: hidden;
+    }
+    /* होम स्क्रीन */
+    .home-screen {
+      height: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .widget-time {
+      color: #fff;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .widget-time h1 {
+      font-size: 50px;
+      font-weight: 200;
+    }
+    .widget-time p {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px 10px;
+      padding: 10px 0;
+    }
+    .app-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .icon-box {
+      width: 55px;
+      height: 55px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .app-name {
+      color: #fff;
+      font-size: 11px;
+      margin-top: 6px;
+      text-align: center;
+    }
+    /* नेविगेशन बार */
+    .nav-bar {
+      height: 40px;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .nav-btn {
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 5px 20px;
+    }
+    /* ऐप विंडो */
+    .app-window {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      display: none;
+      flex-direction: column;
+      z-index: 50;
+    }
+    .app-header {
+      background: #f1f3f4;
+      padding: 12px 15px;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .app-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+    /* स्टोर ऐप */
+    .store-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .store-item-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .install-btn {
+      background: #007aff;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 15px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .install-btn.installed {
+      background: #8e8e93;
+    }
+    /* कैलकुलेटर */
+    .calc-screen {
+      height: 70px;
+      background: #222;
+      color: #fff;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .calc-btn {
+      height: 50px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="notch"></div>
+  
+  <!-- स्टेटस बार -->
+  <div class="status-bar">
+    <span id="current-time">12:00</span>
+    <span>📶 5G 🔋 98%</span>
+  </div>
+
+  <!-- मुख्य स्क्रीन -->
+  <div class="screen">
+    
+    <!-- होम स्क्रीन -->
+    <div class="home-screen" id="home-screen">
+      <div class="widget-time">
+        <h1 id="widget-clock">12:00</h1>
+        <p id="widget-date">सोमवार, 1 जनवरी</p>
+      </div>
+
+      <div class="app-grid" id="apps-container">
+        <!-- ऐप आइकन्स जावास्क्रिप्ट से लोड होई -->
+      </div>
+    </div>
+
+    <!-- पर्सनल ऐप स्टोर -->
+    <div class="app-window" id="app-store">
+      <div class="app-header">
+        <span>पर्सनल ऐप स्टोर</span>
+        <span onclick="closeApp()">✖</span>
+      </div>
+      <div class="app-body" id="store-list">
+        <!-- स्टोर के ऐप्स -->
+      </div>
+    </div>
+
+    <!-- कैलकुलेटर ऐप -->
+    <div class="app-window" id="app-calc">
+      <div class="app-header">
+        <span>कैलकुलेटर</span>
+        <span onclick="closeApp()">✖</span>
+      </div>
+      <div class="app-body">
+        <div class="calc-screen" id="calc-display">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn" onclick="clearCalc()">C</button>
+          <button class="calc-btn" onclick="pressCalc('/')">/</button>
+          <button class="calc-btn" onclick="pressCalc('*')">*</button>
+          <button class="calc-btn" onclick="pressCalc('-')">-</button>
+          <button class="calc-btn" onclick="pressCalc('7')">7</button>
+          <button class="calc-btn" onclick="pressCalc('8')">8</button>
+          <button class="calc-btn" onclick="pressCalc('9')">9</button>
+          <button class="calc-btn" onclick="pressCalc('+')">+</button>
+          <button class="calc-btn" onclick="pressCalc('4')">4</button>
+          <button class="calc-btn" onclick="pressCalc('5')">5</button>
+          <button class="calc-btn" onclick="pressCalc('6')">6</button>
+          <button class="calc-btn" onclick="calcResult()">=</button>
+          <button class="calc-btn" onclick="pressCalc('1')">1</button>
+          <button class="calc-btn" onclick="pressCalc('2')">2</button>
+          <button class="calc-btn" onclick="pressCalc('3')">3</button>
+          <button class="calc-btn" onclick="pressCalc('0')">0</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- नोट्स ऐप -->
+    <div class="app-window" id="app-notes">
+      <div class="app-header">
+        <span>नोट्स</span>
+        <span onclick="closeApp()">✖</span>
+      </div>
+      <div class="app-body">
+        <textarea id="notes-area" style="width: 100%; height: 90%; border: none; outline: none; resize: none; font-size: 16px;" placeholder="यहाँ कुछू लिखीं..."></textarea>
+      </div>
+    </div>
+
+    <!-- सेटिंग्स ऐप -->
+    <div class="app-window" id="app-settings">
+      <div class="app-header">
+        <span>सेटिंग्स</span>
+        <span onclick="closeApp()">✖</span>
+      </div>
+      <div class="app-body">
+        <p><b>डिवाइस:</b> पर्सनल फोन ओएस v1.0</p><br>
+        <p><b>स्टोरेज:</b> 128 GB (उपलब्ध)</p><br>
+        <p><b>नेटवर्क:</b> सुरक्षित निजी नेटवर्क</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- नीचे के नेविगेशन बार -->
+  <div class="nav-bar">
+    <div class="nav-btn" onclick="closeApp()">◀</div>
+    <div class="nav-btn" onclick="closeApp()">●</div>
+    <div class="nav-btn" onclick="closeApp()">■</div>
+  </div>
+</div>
+
+<script>
+  // घड़ी अपडेट
+  function updateTime() {
+    const now = new Date();
+    const hrs = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('current-time').innerText = `${hrs}:${mins}`;
+    document.getElementById('widget-clock').innerText = `${hrs}:${mins}`;
+    
+    const options = { weekday: 'long', month: 'short', day: 'numeric' };
+    document.getElementById('widget-date').innerText = now.toLocaleDateString('hi-IN', options);
+  }
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  // डेटाबेस: कौन-कौन ऐप्स बाड़े
+  const installedApps = [
+    { id: 'app-store', name: 'ऐप स्टोर', icon: '🛍️', bg: '#007aff' },
+    { id: 'app-calc', name: 'कैलकुलेटर', icon: '🧮', bg: '#ff9500' },
+    { id: 'app-notes', name: 'नोट्स', icon: '📝', bg: '#ffcc00' },
+    { id: 'app-settings', name: 'सेटिंग्स', icon: '⚙️', bg: '#8e8e93' }
+  ];
+
+  const storeCatalog = [
+    { id: 'app-music', name: 'म्यूजिक', icon: '🎵', bg: '#ff2d55', installed: false },
+    { id: 'app-camera', name: 'कैमरा', icon: '📷', bg: '#4cd964', installed: false },
+    { id: 'app-chat', name: 'चैट', icon: '💬', bg: '#5856d6', installed: false }
+  ];
+
+  // होम स्क्रीन पर ऐप्स रेंडर करे के फंक्शन
+  function renderHomeApps() {
+    const container = document.getElementById('apps-container');
+    container.innerHTML = '';
+    installedApps.forEach(app => {
+      const el = document.createElement('div');
+      el.className = 'app-icon';
+      el.onclick = () => openApp(app.id);
+      el.innerHTML = `
+        <div class="icon-box" style="background: ${app.bg};">${app.icon}</div>
+        <span class="app-name">${app.name}</span>
+      `;
+      container.appendChild(el);
+    });
+  }
+
+  // ऐप खोले/बंद करे के लॉजिक
+  function openApp(id) {
+    const appEl = document.getElementById(id);
+    if (appEl) {
+      appEl.style.display = 'flex';
+    } else {
+      alert('ई ऐप जल्दिए अपडेट में आई!');
+    }
+  }
+
+  function closeApp() {
+    document.querySelectorAll('.app-window').forEach(win => {
+      win.style.display = 'none';
+    });
+  }
+
+  // पर्सनल स्टोर रेंडर करे के फंक्शन
+  function renderStore() {
+    const list = document.getElementById('store-list');
+    list.innerHTML = '';
+    storeCatalog.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'store-item';
+      row.innerHTML = `
+        <div class="store-item-info">
+          <div class="icon-box" style="width: 42px; height: 42px; font-size: 20px; background: ${item.bg};">${item.icon}</div>
+          <div>
+            <div><b>${item.name}</b></div>
+            <small style="color: #666;">नया ऐप</small>
+          </div>
+        </div>
+        <button class="install-btn ${item.installed ? 'installed' : ''}" onclick="installApp(${index})">
+          ${item.installed ? 'इन्स्टॉल भइल' : 'इन्स्टॉल करीं'}
+        </button>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function installApp(index) {
+    const app = storeCatalog[index];
+    if (!app.installed) {
+      app.installed = true;
+      installedApps.push({ id: app.id, name: app.name, icon: app.icon, bg: app.bg });
+      renderHomeApps();
+      renderStore();
+    }
+  }
+
+  // कैलकुलेटर लॉजिक
+  let calcVal = '';
+  function pressCalc(val) {
+    calcVal += val;
+    document.getElementById('calc-display').innerText = calcVal;
+  }
+  function clearCalc() {
+    calcVal = '';
+    document.getElementById('calc-display').innerText = '0';
+  }
+  function calcResult() {
+    try {
+      calcVal = String(eval(calcVal));
+      document.getElementById('calc-display').innerText = calcVal;
+    } catch {
+      document.getElementById('calc-display').innerText = 'Error';
+      calcVal = '';
+    }
+  }
+
+  // सुरुवाती लोड
+  renderHomeApps();
+  renderStore();
+</script>
+
+</body>
+</html>
